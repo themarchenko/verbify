@@ -1,5 +1,7 @@
 import { headers } from 'next/headers'
 
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
 import { createClient } from '@/shared/api/supabase.server'
 
 import type { Profile } from '../types'
@@ -30,23 +32,25 @@ export async function getProfile(): Promise<Profile | null> {
 }
 
 export async function getSchoolLoginBranding() {
-  const supabase = await createClient()
+  // Use service role to bypass RLS — no user session on login page
+  const supabase = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const headersList = await headers()
   const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? ''
   const hostname = host.split(':')[0]
 
-  console.log('[branding] host header:', host)
-  console.log('[branding] resolved hostname:', hostname)
+  console.log('[branding] hostname:', hostname)
 
   // Resolve school by custom_domain, fall back to first school
-  const { data: schoolByDomain, error: domainError } = await supabase
+  const { data: schoolByDomain } = await supabase
     .from('schools')
-    .select('name, logo_url, login_heading, login_subheading, custom_domain')
+    .select('name, logo_url, login_heading, login_subheading')
     .eq('custom_domain', hostname)
     .single()
 
   console.log('[branding] schoolByDomain:', schoolByDomain)
-  console.log('[branding] domainError:', domainError?.message)
 
   const data = schoolByDomain ?? (
     await supabase
