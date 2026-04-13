@@ -39,45 +39,16 @@ export default async function Icon() {
   const school = await getSchoolLogo()
   const logoUrl = school?.logo_url
 
-  console.log('[icon] logoUrl:', logoUrl)
-
   if (logoUrl) {
+    // Proxy the image directly — ImageResponse/Satori can't handle webp
     const res = await fetch(logoUrl)
-    console.log('[icon] fetch status:', res.status, res.headers.get('content-type'))
-
     if (res.ok) {
-      const contentType = res.headers.get('content-type') ?? 'image/png'
-      const buffer = await res.arrayBuffer()
-      console.log('[icon] buffer size:', buffer.byteLength)
-
-      // Convert to base64 data URI for ImageResponse
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)))
-      const dataUri = `data:${contentType};base64,${base64}`
-      console.log('[icon] dataUri length:', dataUri.length)
-
-      return new ImageResponse(
-        (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={dataUri}
-              alt=""
-              width={32}
-              height={32}
-              style={{ objectFit: 'contain' }}
-            />
-          </div>
-        ),
-        { ...size }
-      )
+      return new Response(await res.arrayBuffer(), {
+        headers: {
+          'Content-Type': res.headers.get('content-type') ?? 'image/png',
+          'Cache-Control': 'public, max-age=3600',
+        },
+      })
     }
   }
 
