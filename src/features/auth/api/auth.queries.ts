@@ -1,3 +1,5 @@
+import { headers } from 'next/headers'
+
 import { createClient } from '@/shared/api/supabase.server'
 
 import type { Profile } from '../types'
@@ -29,14 +31,24 @@ export async function getProfile(): Promise<Profile | null> {
 
 export async function getSchoolLoginBranding() {
   const supabase = await createClient()
+  const headersList = await headers()
+  const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? ''
+  const hostname = host.split(':')[0]
 
-  // In production, resolve school by custom_domain from request headers.
-  // For now, fetch the first school as default.
-  const { data } = await supabase
+  // Resolve school by custom_domain, fall back to first school
+  const { data: schoolByDomain } = await supabase
     .from('schools')
     .select('name, logo_url, login_heading, login_subheading')
-    .limit(1)
+    .eq('custom_domain', hostname)
     .single()
+
+  const data = schoolByDomain ?? (
+    await supabase
+      .from('schools')
+      .select('name, logo_url, login_heading, login_subheading')
+      .limit(1)
+      .single()
+  ).data
 
   return {
     name: data?.name ?? 'Verbify',
