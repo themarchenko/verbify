@@ -35,12 +35,18 @@ export async function getSchoolLoginBranding() {
   const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? ''
   const hostname = host.split(':')[0]
 
+  console.log('[branding] host header:', host)
+  console.log('[branding] resolved hostname:', hostname)
+
   // Resolve school by custom_domain, fall back to first school
-  const { data: schoolByDomain } = await supabase
+  const { data: schoolByDomain, error: domainError } = await supabase
     .from('schools')
-    .select('name, logo_url, login_heading, login_subheading')
+    .select('name, logo_url, login_heading, login_subheading, custom_domain')
     .eq('custom_domain', hostname)
     .single()
+
+  console.log('[branding] schoolByDomain:', schoolByDomain)
+  console.log('[branding] domainError:', domainError?.message)
 
   const data = schoolByDomain ?? (
     await supabase
@@ -49,6 +55,8 @@ export async function getSchoolLoginBranding() {
       .limit(1)
       .single()
   ).data
+
+  console.log('[branding] final data:', data)
 
   return {
     name: data?.name ?? 'Verbify',
