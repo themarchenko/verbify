@@ -12,7 +12,6 @@ export default async function LoginPage() {
   return (
     <UnsplashBackground
       className="flex min-h-svh flex-col items-center justify-center p-4 sm:p-6 md:p-10"
-      interval={12000}
     >
       <div className="w-full max-w-[480px] md:max-w-8xl">
         <Card className="overflow-hidden py-0 border-0">

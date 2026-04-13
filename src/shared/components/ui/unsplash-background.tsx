@@ -2,36 +2,8 @@
 
 import * as React from 'react'
 
+import { getRandomUnsplashPhoto } from '@/shared/api/unsplash.actions'
 import { cn } from '@/shared/lib/utils'
-
-const UNSPLASH_QUERIES = [
-  'ocean waves',
-  'underwater coral reef',
-  'coastal cliffs',
-  'tropical beach',
-  'deep sea',
-  'sailing boat ocean',
-  'lighthouse sea',
-]
-
-async function fetchRandomPhoto(): Promise<string | null> {
-  const accessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
-  if (!accessKey) return null
-
-  const query = UNSPLASH_QUERIES[Math.floor(Math.random() * UNSPLASH_QUERIES.length)]
-
-  try {
-    const res = await fetch(
-      `https://api.unsplash.com/photos/random?query=${query}&orientation=landscape&w=1920`,
-      { headers: { Authorization: `Client-ID ${accessKey}` } }
-    )
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.urls?.regular || null
-  } catch {
-    return null
-  }
-}
 
 type UnsplashBackgroundProps = {
   className?: string
@@ -39,7 +11,7 @@ type UnsplashBackgroundProps = {
   children?: React.ReactNode
 }
 
-function UnsplashBackground({ className, interval = 12000, children }: UnsplashBackgroundProps) {
+function UnsplashBackground({ className, interval = 60000, children }: UnsplashBackgroundProps) {
   const [images, setImages] = React.useState<[string, string]>(['', ''])
   const [activeIndex, setActiveIndex] = React.useState(0)
   const activeRef = React.useRef(0)
@@ -48,7 +20,7 @@ function UnsplashBackground({ className, interval = 12000, children }: UnsplashB
     let cancelled = false
 
     async function loadInitial() {
-      const url = await fetchRandomPhoto()
+      const url = await getRandomUnsplashPhoto()
       if (!cancelled && url) {
         const img = new Image()
         img.onload = () => {
@@ -60,7 +32,7 @@ function UnsplashBackground({ className, interval = 12000, children }: UnsplashB
     loadInitial()
 
     const timer = setInterval(async () => {
-      const url = await fetchRandomPhoto()
+      const url = await getRandomUnsplashPhoto()
       if (cancelled || !url) return
 
       const img = new Image()
