@@ -39,11 +39,22 @@ export default async function Icon() {
   const school = await getSchoolLogo()
   const logoUrl = school?.logo_url
 
+  console.log('[icon] logoUrl:', logoUrl)
+
   if (logoUrl) {
-    // Fetch the image and read as ArrayBuffer for ImageResponse
     const res = await fetch(logoUrl)
+    console.log('[icon] fetch status:', res.status, res.headers.get('content-type'))
+
     if (res.ok) {
-      const imageData = await res.arrayBuffer()
+      const contentType = res.headers.get('content-type') ?? 'image/png'
+      const buffer = await res.arrayBuffer()
+      console.log('[icon] buffer size:', buffer.byteLength)
+
+      // Convert to base64 data URI for ImageResponse
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)))
+      const dataUri = `data:${contentType};base64,${base64}`
+      console.log('[icon] dataUri length:', dataUri.length)
+
       return new ImageResponse(
         (
           <div
@@ -57,7 +68,7 @@ export default async function Icon() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={imageData as unknown as string}
+              src={dataUri}
               alt=""
               width={32}
               height={32}
