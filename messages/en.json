@@ -209,7 +209,17 @@
     "fileUploadCustomExtension": "Add custom extension (press Enter)",
     "fileUploadMaxSize": "Max file size (MB)",
     "fileUploadMaxFiles": "Max number of files",
-    "fileUploadPreviewNote": "Students will see a file upload area. Teacher reviews uploaded files."
+    "fileUploadPreviewNote": "Students will see a file upload area. Teacher reviews uploaded files.",
+    "fill_in_blank": "Fill in blank",
+    "fillInBlank": "Fill in blank",
+    "fillInBlankHelp": "Use '{{1}}', '{{2}}' etc. in the sentence to mark blanks. Add one answer per blank.",
+    "fillInBlankSentence": "Sentence",
+    "fillInBlankSentencePlaceholder": "Juan no '{{1}}' sus gafas. (encontrar)",
+    "fillInBlankHint": "Hint (e.g. infinitive verb)",
+    "fillInBlankAnswers": "Correct answers",
+    "fillInBlankAnswerPlaceholder": "Answer {n}",
+    "fillInBlankAddAnswer": "Add blank",
+    "fillInBlankAddSentence": "Add sentence"
   },
   "students": {
     "title": "Students",
@@ -386,6 +396,7 @@
     "allLessons": "All lessons",
     "taskComplete": "Task complete!",
     "next": "Next",
+    "fillInBlankCheck": "Check",
     "allCourses": "All courses",
     "lessonLocked": "Complete the previous lesson first",
     "continueLearning": "Continue learning",
