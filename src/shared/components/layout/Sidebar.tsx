@@ -92,6 +92,14 @@ export function AppSidebar({
     (item.roles as readonly string[]).includes(userRole)
   )
 
+  const roleLabels: Record<string, string> = {
+    owner: t('staff.roleOwner'),
+    teacher: t('staff.roleTeacher'),
+    student: t('staff.roleStudent'),
+    manager: t('staff.roleManager'),
+  }
+  const roleLabel = roleLabels[userRole] || userRole
+
   const canAccessSettings = userRole === 'owner' || userPermissions.includes('manage_settings')
   const canAccessBilling = userRole === 'owner' || userPermissions.includes('manage_billing')
 
@@ -114,7 +122,7 @@ export function AppSidebar({
               )}
               <div className="grid flex-1 text-left text-base leading-tight">
                 <span className="truncate font-semibold">{schoolName}</span>
-                <span className="truncate text-sm capitalize">{userRole}</span>
+                <span className="truncate text-sm">{roleLabel}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -163,8 +171,8 @@ export function AppSidebar({
                 </Avatar>
                 <div className="grid flex-1 text-left text-base leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-semibold">{userName}</span>
-                  <span className="truncate text-sm capitalize text-muted-foreground">
-                    {userRole}
+                  <span className="truncate text-sm text-muted-foreground">
+                    {roleLabel}
                   </span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
@@ -186,9 +194,9 @@ export function AppSidebar({
                     <span className="truncate text-sm font-semibold">{userName}</span>
                     <Badge
                       variant="secondary"
-                      className="mt-0.5 w-fit px-1.5 py-0 text-[10px] capitalize"
+                      className="mt-0.5 w-fit px-1.5 py-0 text-[10px]"
                     >
-                      {userRole}
+                      {roleLabel}
                     </Badge>
                   </div>
                 </div>
