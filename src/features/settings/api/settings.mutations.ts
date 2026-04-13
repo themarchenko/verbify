@@ -45,7 +45,8 @@ export async function uploadSchoolLogo(formData: FormData) {
 
     const contentType = file.type || 'image/webp'
     const ext = contentType === 'image/png' ? 'png' : contentType === 'image/jpeg' ? 'jpg' : 'webp'
-    const path = `${schoolId}/logo.${ext}`
+    const hash = Date.now().toString(36)
+    const path = `${schoolId}/logo-${hash}.${ext}`
 
     // Remove old logo files first (may have different extension)
     const { data: existing } = await supabase.storage.from('school-logos').list(schoolId)
