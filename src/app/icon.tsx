@@ -46,7 +46,7 @@ export default async function Icon() {
       return new Response(await res.arrayBuffer(), {
         headers: {
           'Content-Type': res.headers.get('content-type') ?? 'image/png',
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'no-cache',
         },
       })
     }
