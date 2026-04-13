@@ -4,7 +4,6 @@ import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'edge'
-export const dynamic = 'force-dynamic'
 export const contentType = 'image/png'
 export const size = { width: 32, height: 32 }
 
@@ -46,7 +45,7 @@ export default async function Icon() {
       return new Response(await res.arrayBuffer(), {
         headers: {
           'Content-Type': res.headers.get('content-type') ?? 'image/png',
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'public, max-age=86400',
         },
       })
     }

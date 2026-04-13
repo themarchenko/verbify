@@ -11,6 +11,7 @@ import { updateCustomDomainSchema, updateSchoolNameSchema } from '../model/setti
 function revalidateAll() {
   revalidatePath('/dashboard', 'layout')
   revalidatePath('/learn', 'layout')
+  revalidatePath('/icon')
 }
 
 export async function updateSchoolName(name: string) {
