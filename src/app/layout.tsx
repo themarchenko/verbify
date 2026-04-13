@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { Geist, Geist_Mono } from 'next/font/google'
 
+import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 
 import './globals.css'
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <NextIntlClientProvider messages={messages}>
           {children}
+          <Analytics />
           <Toaster position="bottom-right" />
         </NextIntlClientProvider>
       </body>
