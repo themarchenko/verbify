@@ -41,7 +41,13 @@ export async function getSchoolLoginBranding() {
   const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? ''
   const hostname = host.split(':')[0]
 
-  console.log('[branding] hostname:', hostname)
+  console.log('[branding] hostname:', JSON.stringify(hostname))
+
+  // Debug: see what custom_domain values exist in DB
+  const { data: allSchools } = await supabase
+    .from('schools')
+    .select('id, name, custom_domain')
+  console.log('[branding] all schools:', JSON.stringify(allSchools))
 
   // Resolve school by custom_domain, fall back to first school
   const { data: schoolByDomain } = await supabase
