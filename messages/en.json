@@ -186,8 +186,8 @@
     "audioAddQuestion": "Add comprehension question",
     "videoUrl": "Video URL (YouTube or direct link)",
     "videoInvalidUrl": "Invalid URL",
-    "embedUrl": "Link (Figma, Miro)",
-    "embedUrlPlaceholder": "Paste a Figma or Miro link...",
+    "embedUrl": "Link (Figma, Miro, Canva)",
+    "embedUrlPlaceholder": "Paste a Figma, Miro or Canva link...",
     "embedCodeLabel": "Or paste embed code (iframe)",
     "embedCode": "Paste embed code (iframe)...",
     "embedPreview": "Preview",
@@ -330,7 +330,7 @@
     "loginSubheadingPlaceholder": "Welcome message for your students",
     "saving": "Saving...",
     "colorScheme": "Color scheme",
-    "colorSchemeDescription": "Choose a color scheme for your student-facing pages.",
+    "colorSchemeDescription": "Choose an accent color for buttons and interactive elements.",
     "schemeDefault": "Default",
     "schemeOcean": "Ocean",
     "schemeForest": "Forest",
@@ -339,6 +339,8 @@
     "schemeRose": "Rose",
     "schemeAmber": "Amber",
     "schemeSlate": "Slate",
+    "schemeCustom": "Custom",
+    "customColorLabel": "Brand color",
     "saved": "Saved"
   },
   "billing": {

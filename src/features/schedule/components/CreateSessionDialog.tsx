@@ -399,7 +399,7 @@ export function CreateSessionDialog({
                           onClick={() => toggleRepeatDay(key)}
                           className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                             repeatDays.includes(key)
-                              ? 'bg-foreground text-background'
+                              ? 'bg-primary text-primary-foreground'
                               : 'bg-muted text-muted-foreground hover:bg-muted/80'
                           }`}
                         >

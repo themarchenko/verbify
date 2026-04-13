@@ -124,16 +124,22 @@ export async function updateCustomDomain(domain: string | null) {
   }
 }
 
-export async function updateColorScheme(scheme: string) {
+export async function updateColorScheme(scheme: string, customHex?: string) {
   try {
-    if (!(scheme in COLOR_SCHEMES)) return { error: 'Invalid color scheme' }
+    if (scheme !== 'custom' && !(scheme in COLOR_SCHEMES)) return { error: 'Invalid color scheme' }
+    if (scheme === 'custom' && (!customHex || !/^#[0-9a-fA-F]{6}$/.test(customHex))) {
+      return { error: 'Invalid hex color' }
+    }
 
     const { schoolId } = await requireOwner()
     const supabase = await createClient()
 
     const { error } = await supabase
       .from('schools')
-      .update({ color_scheme: scheme })
+      .update({
+        color_scheme: scheme,
+        primary_color: scheme === 'custom' ? customHex! : null,
+      })
       .eq('id', schoolId)
 
     if (error) return { error: error.message }

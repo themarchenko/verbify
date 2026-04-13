@@ -186,8 +186,8 @@
     "audioAddQuestion": "Додати питання до аудіо",
     "videoUrl": "Посилання на відео (YouTube або пряме)",
     "videoInvalidUrl": "Невірне посилання",
-    "embedUrl": "Посилання (Figma, Miro)",
-    "embedUrlPlaceholder": "Вставте посилання Figma або Miro...",
+    "embedUrl": "Посилання (Figma, Miro, Canva)",
+    "embedUrlPlaceholder": "Вставте посилання Figma, Miro або Canva...",
     "embedCodeLabel": "Або вставте embed-код (iframe)",
     "embedCode": "Вставте embed-код (iframe)...",
     "embedPreview": "Попередній перегляд",
@@ -330,7 +330,7 @@
     "loginSubheadingPlaceholder": "Привітальне повідомлення для учнів",
     "saving": "Збереження...",
     "colorScheme": "Кольорова схема",
-    "colorSchemeDescription": "Оберіть кольорову схему для сторінок учнів.",
+    "colorSchemeDescription": "Оберіть акцентний колір для кнопок та інтерактивних елементів.",
     "schemeDefault": "Стандартна",
     "schemeOcean": "Океан",
     "schemeForest": "Ліс",
@@ -339,6 +339,8 @@
     "schemeRose": "Троянда",
     "schemeAmber": "Бурштин",
     "schemeSlate": "Сланець",
+    "schemeCustom": "Свій колір",
+    "customColorLabel": "Колір бренду",
     "saved": "Збережено"
   },
   "billing": {

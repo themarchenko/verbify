@@ -116,7 +116,7 @@ export function StudentAssignmentSelect({
                     className={cn(
                       'flex items-center justify-center size-5 rounded border',
                       selectedIds.has(student.studentId)
-                        ? 'bg-foreground border-foreground text-background'
+                        ? 'bg-primary border-primary text-primary-foreground'
                         : 'border-border'
                     )}
                   >

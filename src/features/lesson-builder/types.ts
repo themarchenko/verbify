@@ -7,6 +7,7 @@ export type BlockType =
   | 'embed'
   | 'open_answer'
   | 'file_upload'
+  | 'fill_in_blank'
 
 export type Block = {
   id: string
@@ -70,4 +71,14 @@ export type FileUploadBlockContent = {
   allowed_extensions?: string[]
   max_file_size_mb?: number
   max_files?: number
+}
+
+export type FillInBlankBlockContent = {
+  questions: Array<{
+    id: string
+    sentence: string
+    hint?: string
+    answers: string[]
+    explanation?: string
+  }>
 }

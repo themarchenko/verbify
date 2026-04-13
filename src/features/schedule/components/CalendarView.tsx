@@ -226,7 +226,7 @@ export function CalendarView({ sessions, teachers, lessons, currentProfileId, us
               return (
                 <div
                   key={d.toISOString()}
-                  className={`px-2 py-2 text-center text-xs font-medium border-r last:border-r-0 ${isToday ? 'bg-foreground text-background' : 'text-muted-foreground'}`}
+                  className={`px-2 py-2 text-center text-xs font-medium border-r last:border-r-0 ${isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
                 >
                   {formatDayHeader(d, locale)}
                 </div>

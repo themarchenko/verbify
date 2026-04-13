@@ -31,7 +31,7 @@ export function LanguageSwitcher() {
           className={cn(
             'px-3 py-1.5 text-sm rounded cursor-pointer transition-colors',
             locale === l
-              ? 'bg-foreground text-background font-medium'
+              ? 'bg-primary text-primary-foreground font-medium'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           )}
         >

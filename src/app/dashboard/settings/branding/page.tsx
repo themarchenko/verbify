@@ -25,6 +25,7 @@ export default async function BrandingSettingsPage() {
   return (
     <BrandingSettingsContent
       colorScheme={school.color_scheme}
+      primaryColor={school.primary_color}
       loginHeading={school.login_heading}
       loginSubheading={school.login_subheading}
     />

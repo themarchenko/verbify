@@ -1,4 +1,5 @@
 import { createClient } from '@/shared/api/supabase.server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 
 const PAGE_SIZE = 30
 
@@ -77,6 +78,18 @@ export async function getStudentDetail(studentProfileId: string) {
     .single()
 
   if (!student) return null
+
+  // Fetch email from auth.users via admin API
+  let email: string | null = null
+  if (student.user_id) {
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+    const { data: authUser } = await admin.auth.admin.getUserById(student.user_id)
+    email = authUser?.user?.email ?? null
+  }
 
   // Enrollments with course info
   const { data: enrollments } = await supabase
@@ -194,7 +207,7 @@ export async function getStudentDetail(studentProfileId: string) {
       ?.completed_at || null
 
   return {
-    student,
+    student: { ...student, email },
     stats: {
       coursesEnrolled: courseAnalytics.length,
       completedBlocks: completedCount,

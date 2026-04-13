@@ -15,15 +15,7 @@ import {
   Trash2,
 } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/confirm-dialog'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,17 +23,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
-import { deleteStudent, fetchStudentsPage, updateStudent } from '../api/students.mutations'
+import { deleteStudent, fetchStudentsPage } from '../api/students.mutations'
+import { useEditStudentDialog } from '../hooks/useEditStudentDialog'
 import { InviteStudentDialog } from './InviteStudentDialog'
 
 interface Student {
@@ -150,7 +135,6 @@ export function StudentList({
 }: StudentListProps) {
   const t = useTranslations('students')
   const tc = useTranslations('common')
-  const tAuth = useTranslations('auth')
   const [confirm, confirmDialog] = useConfirm()
 
   const [students, setStudents] = useState<Student[]>(initialStudents)
@@ -159,8 +143,6 @@ export function StudentList({
 
   const [search, setSearch] = useState('')
   const [courseId, setCourseId] = useState(ALL_COURSES)
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null)
-  const [loading, setLoading] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [loadingMore, setLoadingMore] = useState(false)
 
@@ -181,6 +163,10 @@ export function StudentList({
       setHasMore(result.hasMore)
     })
   }, [])
+
+  const { editStudent, editStudentDialog } = useEditStudentDialog({
+    onSaved: () => loadStudents(search, courseId),
+  })
 
   // Debounced search
   function handleSearchChange(value: string) {
@@ -247,17 +233,6 @@ export function StudentList({
     if (!ok) return
     await deleteStudent(student.id)
     // Reload current view
-    loadStudents(search, courseId)
-  }
-
-  async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!editingStudent) return
-    setLoading(true)
-    const fd = new FormData(e.currentTarget)
-    await updateStudent(editingStudent.id, fd.get('fullName') as string)
-    setEditingStudent(null)
-    setLoading(false)
     loadStudents(search, courseId)
   }
 
@@ -331,7 +306,7 @@ export function StudentList({
                   <MoreVertical size={16} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => setEditingStudent(student)}>
+                  <DropdownMenuItem onClick={() => editStudent(student.id)}>
                     <Pencil size={14} className="mr-2 shrink-0" />
                     {t('editStudent')}
                   </DropdownMenuItem>
@@ -357,30 +332,7 @@ export function StudentList({
         </div>
       )}
 
-      <Dialog open={!!editingStudent} onOpenChange={(open) => !open && setEditingStudent(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('editStudent')}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-name">{tAuth('fullName')}</Label>
-              <Input
-                id="edit-name"
-                name="fullName"
-                defaultValue={editingStudent?.full_name || ''}
-                required
-                autoFocus
-              />
-            </div>
-            <DialogFooter>
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-                {loading ? tc('loading') : tc('save')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {editStudentDialog}
       {confirmDialog}
     </div>
   )

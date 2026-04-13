@@ -5,24 +5,15 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { removeEnrollment, updateEnrollmentExpiration } from '@/features/enrollments'
+import { EnrollmentDatePicker } from '@/features/enrollments/components/EnrollmentDatePicker'
 import { formatDateMedium } from '@/shared/lib/date'
-import { ArrowLeft, BookOpen, Clock, Pencil, Plus, Target, TrendingUp, X, Zap } from 'lucide-react'
+import { ArrowLeft, BookOpen, Mail, Pencil, Plus, Target, TrendingUp, X, Zap } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useConfirm } from '@/components/ui/confirm-dialog'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-import { updateStudent } from '../api/students.mutations'
+import { useEditStudentDialog } from '../hooks/useEditStudentDialog'
 import { EnrollStudentInCourseDialog } from './EnrollStudentInCourseDialog'
 
 interface CourseAnalytics {
@@ -48,6 +39,7 @@ interface StudentDetailProps {
   student: {
     id: string
     full_name: string | null
+    email: string | null
     avatar_url: string | null
     created_at: string | null
   }
@@ -73,7 +65,7 @@ function ProgressBar({ percent }: { percent: number }) {
   return (
     <div className="h-2 w-full rounded-full bg-muted">
       <div
-        className="h-2 rounded-full bg-foreground transition-all"
+        className="h-2 rounded-full bg-primary transition-all"
         style={{ width: `${Math.min(100, percent)}%` }}
       />
     </div>
@@ -83,21 +75,10 @@ function ProgressBar({ percent }: { percent: number }) {
 export function StudentDetail({ student, stats, courses, availableCourses }: StudentDetailProps) {
   const t = useTranslations('students')
   const tc = useTranslations('common')
-  const tAuth = useTranslations('auth')
   const locale = useLocale()
-  const [editing, setEditing] = useState(false)
   const [enrollOpen, setEnrollOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [confirm, confirmDialog] = useConfirm()
-
-  async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    const fd = new FormData(e.currentTarget)
-    await updateStudent(student.id, fd.get('fullName') as string)
-    setEditing(false)
-    setLoading(false)
-  }
+  const { editStudent, editStudentDialog } = useEditStudentDialog()
 
   const statCards = [
     {
@@ -142,10 +123,16 @@ export function StudentDetail({ student, stats, courses, availableCourses }: Stu
             <h1 className="text-2xl font-bold tracking-tight truncate">
               {student.full_name || t('unnamed')}
             </h1>
-            <Button variant="ghost" size="icon-sm" onClick={() => setEditing(true)}>
+            <Button variant="ghost" size="icon-sm" onClick={() => editStudent(student.id)}>
               <Pencil size={14} />
             </Button>
           </div>
+          {student.email && (
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
+              <Mail size={13} />
+              {student.email}
+            </p>
+          )}
           <p className="text-sm text-muted-foreground mt-0.5">
             {t('joinedOn', { date: formatDate(student.created_at, locale) })}
             {stats.lastActivity && (
@@ -215,31 +202,7 @@ export function StudentDetail({ student, stats, courses, availableCourses }: Stu
         )}
       </div>
 
-      {/* Edit dialog */}
-      <Dialog open={editing} onOpenChange={setEditing}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('editStudent')}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-name">{tAuth('fullName')}</Label>
-              <Input
-                id="edit-name"
-                name="fullName"
-                defaultValue={student.full_name || ''}
-                required
-                autoFocus
-              />
-            </div>
-            <DialogFooter>
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-                {loading ? tc('loading') : tc('save')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {editStudentDialog}
 
       <EnrollStudentInCourseDialog
         open={enrollOpen}
@@ -268,17 +231,13 @@ function CourseEnrollmentCard({
 }) {
   const t = useTranslations('students')
   const tc = useTranslations('common')
-  const tLearn = useTranslations('learn')
   const locale = useLocale()
   const [expiresAt, setExpiresAt] = useState(course.expiresAt ? course.expiresAt.split('T')[0] : '')
-  const [saving, setSaving] = useState(false)
 
-  const isExpired = course.expiresAt && new Date(course.expiresAt) < new Date()
+  const isExpired = !!(course.expiresAt && new Date(course.expiresAt) < new Date())
 
-  async function handleUpdateExpiration() {
-    setSaving(true)
-    await updateEnrollmentExpiration(course.enrollmentId, expiresAt || null)
-    setSaving(false)
+  async function handleSaveExpiration(value: string | null) {
+    await updateEnrollmentExpiration(course.enrollmentId, value)
   }
 
   async function handleRemove() {
@@ -311,12 +270,6 @@ function CourseEnrollmentCard({
               >
                 {course.isPublished ? 'Published' : 'Draft'}
               </Badge>
-              {isExpired && (
-                <Badge variant="destructive" className="text-xs shrink-0 gap-1">
-                  <Clock size={10} />
-                  {tLearn('accessExpired')}
-                </Badge>
-              )}
             </div>
             <p className="text-sm text-muted-foreground mt-0.5">
               {course.totalLessons} {course.totalLessons === 1 ? 'lesson' : 'lessons'}
@@ -349,28 +302,12 @@ function CourseEnrollmentCard({
 
         {/* Enrollment controls */}
         <div className="flex items-center gap-2 mt-3 pt-3 border-t">
-          <Input
-            type="date"
+          <EnrollmentDatePicker
             value={expiresAt}
-            onChange={(e) => setExpiresAt(e.target.value)}
-            className="w-36 h-8 text-xs"
+            onChange={setExpiresAt}
+            onSave={handleSaveExpiration}
+            isExpired={isExpired}
           />
-          {expiresAt !== (course.expiresAt ? course.expiresAt.split('T')[0] : '') && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs"
-              onClick={handleUpdateExpiration}
-              disabled={saving}
-            >
-              {saving ? tc('saving') : tc('save')}
-            </Button>
-          )}
-          {!expiresAt && (
-            <Badge variant="secondary" className="text-xs">
-              {t('permanent')}
-            </Badge>
-          )}
           <div className="flex-1" />
           <Button
             variant="ghost"

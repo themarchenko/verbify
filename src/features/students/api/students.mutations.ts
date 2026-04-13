@@ -80,7 +80,29 @@ export async function fetchStudentsPage(opts: {
   return getStudentsPaginated(schoolId, opts)
 }
 
-export async function updateStudent(profileId: string, fullName: string) {
+export async function getStudentForEdit(profileId: string) {
+  const { schoolId } = await requireTeacherOrOwner()
+  const admin = await getAdminClient()
+
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('id, user_id, full_name')
+    .eq('id', profileId)
+    .eq('school_id', schoolId)
+    .single()
+
+  if (!profile) return null
+
+  let email: string | null = null
+  if (profile.user_id) {
+    const { data: authUser } = await admin.auth.admin.getUserById(profile.user_id)
+    email = authUser?.user?.email ?? null
+  }
+
+  return { id: profile.id, full_name: profile.full_name, email }
+}
+
+export async function updateStudent(profileId: string, fullName: string, email?: string) {
   const { schoolId } = await requireTeacherOrOwner()
   const admin = await getAdminClient()
 
@@ -91,6 +113,23 @@ export async function updateStudent(profileId: string, fullName: string) {
     .eq('school_id', schoolId)
 
   if (error) return { error: error.message }
+
+  // Update email in auth.users if provided
+  if (email) {
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('user_id')
+      .eq('id', profileId)
+      .eq('school_id', schoolId)
+      .single()
+
+    if (profile?.user_id) {
+      const { error: authError } = await admin.auth.admin.updateUserById(profile.user_id, {
+        email,
+      })
+      if (authError) return { error: authError.message }
+    }
+  }
 
   revalidatePath('/dashboard/students')
   return { error: null }

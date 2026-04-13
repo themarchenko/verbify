@@ -24,6 +24,7 @@ interface DashboardChartsProps {
   totalStudents: number
   totalCourses: number
   totalLessons: number
+  accentColor: string
 }
 
 function generateStudentGrowthData(total: number) {
@@ -47,6 +48,7 @@ export function DashboardCharts({
   totalStudents,
   totalCourses,
   totalLessons,
+  accentColor,
 }: DashboardChartsProps) {
   const t = useTranslations('dashboard')
 
@@ -57,7 +59,7 @@ export function DashboardCharts({
   const inProgressLessons = totalLessons - completedLessons
 
   const pieData = [
-    { name: t('completed'), value: completedLessons || 1, color: '#18181b' },
+    { name: t('completed'), value: completedLessons || 1, color: accentColor },
     { name: t('inProgress'), value: inProgressLessons || 1, color: '#e4e4e7' },
   ]
 
@@ -73,8 +75,8 @@ export function DashboardCharts({
             <AreaChart data={studentData}>
               <defs>
                 <linearGradient id="studentGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#18181b" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#18181b" stopOpacity={0} />
+                  <stop offset="0%" stopColor={accentColor} stopOpacity={0.15} />
+                  <stop offset="100%" stopColor={accentColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
@@ -102,7 +104,7 @@ export function DashboardCharts({
               <Area
                 type="monotone"
                 dataKey="students"
-                stroke="#18181b"
+                stroke={accentColor}
                 strokeWidth={2}
                 fill="url(#studentGradient)"
                 name={t('newStudents')}
@@ -144,7 +146,7 @@ export function DashboardCharts({
               />
               <Bar
                 dataKey="enrollments"
-                fill="#18181b"
+                fill={accentColor}
                 radius={[4, 4, 0, 0]}
                 name={t('enrollments')}
               />

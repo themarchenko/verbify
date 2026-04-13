@@ -16,9 +16,12 @@ import { Card, CardContent } from '@/components/ui/card'
 
 import { sanitizeEmbed, sanitizeHtml } from '@/lib/sanitize'
 
+import type { FillInBlankBlockContent } from '@/features/lesson-builder/types'
+
 import { saveProgress } from '../api/learn.mutations'
 import { LessonComplete } from './LessonComplete'
 import { FileUploadPlayer } from './blocks/FileUploadPlayer'
+import { FillInBlankPlayer } from './blocks/FillInBlankPlayer'
 import { OpenAnswerPlayer } from './blocks/OpenAnswerPlayer'
 
 interface LessonPlayerProps {
@@ -44,7 +47,11 @@ interface LessonPlayerProps {
 
 function isInteractiveBlock(type: string) {
   return (
-    type === 'quiz' || type === 'flashcards' || type === 'open_answer' || type === 'file_upload'
+    type === 'quiz' ||
+    type === 'flashcards' ||
+    type === 'open_answer' ||
+    type === 'file_upload' ||
+    type === 'fill_in_blank'
   )
 }
 
@@ -317,6 +324,15 @@ function StudentBlockRenderer({
               max_files?: number
             }
           }
+          blockId={block.id}
+          lessonId={lessonId}
+          onComplete={onComplete}
+        />
+      )
+    case 'fill_in_blank':
+      return (
+        <FillInBlankPlayer
+          content={block.content as FillInBlankBlockContent}
           blockId={block.id}
           lessonId={lessonId}
           onComplete={onComplete}

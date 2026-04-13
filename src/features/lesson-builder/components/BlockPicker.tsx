@@ -6,6 +6,7 @@ import { useState } from 'react'
 import {
   Code,
   FileText,
+  FormInput,
   Headphones,
   HelpCircle,
   Layers,
@@ -27,6 +28,7 @@ const blockTypes: Array<{ type: BlockType; icon: typeof FileText; key: string }>
   { type: 'embed', icon: Code, key: 'embed' },
   { type: 'open_answer', icon: MessageSquare, key: 'openAnswer' },
   { type: 'file_upload', icon: Upload, key: 'fileUpload' },
+  { type: 'fill_in_blank', icon: FormInput, key: 'fillInBlank' },
 ]
 
 interface BlockPickerProps {

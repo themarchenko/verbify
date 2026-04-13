@@ -41,17 +41,19 @@ export async function getSchoolLoginBranding() {
   const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? ''
   const hostname = host.split(':')[0]
 
+  const selectCols = 'name, logo_url, login_heading, login_subheading, color_scheme, primary_color'
+
   // Resolve school by custom_domain, fall back to first school
   const { data: schoolByDomain } = await supabase
     .from('schools')
-    .select('name, logo_url, login_heading, login_subheading')
+    .select(selectCols)
     .eq('custom_domain', hostname)
     .single()
 
   const data = schoolByDomain ?? (
     await supabase
       .from('schools')
-      .select('name, logo_url, login_heading, login_subheading')
+      .select(selectCols)
       .limit(1)
       .single()
   ).data
@@ -61,5 +63,7 @@ export async function getSchoolLoginBranding() {
     logoUrl: data?.logo_url ?? null,
     loginHeading: data?.login_heading ?? data?.name ?? 'Verbify',
     loginSubheading: data?.login_subheading ?? null,
+    colorScheme: data?.color_scheme ?? null,
+    primaryColor: data?.primary_color ?? null,
   }
 }

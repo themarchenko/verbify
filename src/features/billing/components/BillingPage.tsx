@@ -86,7 +86,7 @@ export function BillingPage({ currentPlan, subscriptionStatus, trialEndsAt }: Bi
 
               <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-foreground transition-all duration-500"
+                  className="h-full rounded-full bg-primary transition-all duration-500"
                   style={{
                     width: `${Math.max(4, Math.min(100, ((daysRemaining ?? 0) / 30) * 100))}%`,
                   }}

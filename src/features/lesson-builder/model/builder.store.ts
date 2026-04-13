@@ -110,5 +110,9 @@ function getDefaultContent(type: BlockType): Record<string, unknown> {
         max_file_size_mb: 10,
         max_files: 1,
       }
+    case 'fill_in_blank':
+      return {
+        questions: [{ id: crypto.randomUUID(), sentence: '', hint: '', answers: [''] }],
+      }
   }
 }

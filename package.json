@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "seed:demo": "tsx --env-file=.env.local scripts/seed-demo.ts"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx,json,css,md}": [
@@ -39,6 +40,7 @@
     "next": "^16.2.1",
     "next-intl": "^4.8.3",
     "react": "^19.2.4",
+    "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.4",
     "react-image-crop": "^11.0.10",
     "recharts": "^3.8.1",

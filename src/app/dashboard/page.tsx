@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 
 import { DashboardCharts } from '@/features/dashboard/components/DashboardCharts'
+import { resolveSchemeColors } from '@/features/settings/model/color-schemes.config'
 import { createClient } from '@/shared/api/supabase.server'
 import { BookOpen, ClipboardCheck, GraduationCap, Plus, UserPlus, Users } from 'lucide-react'
 
@@ -26,36 +27,51 @@ export default async function DashboardPage() {
   const userName = profile?.full_name?.split(' ')[0] || ''
   const schoolId = profile?.school_id
 
-  const [studentsResult, coursesResult, lessonsResult, recentCoursesResult, pendingReviewsResult] =
-    await Promise.all([
-      supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('school_id', schoolId!)
-        .eq('role', 'student'),
-      supabase
-        .from('courses')
-        .select('*', { count: 'exact', head: true })
-        .eq('school_id', schoolId!),
-      supabase
-        .from('lessons')
-        .select('*', { count: 'exact', head: true })
-        .eq('school_id', schoolId!)
-        .eq('is_published', true),
-      supabase
-        .from('courses')
-        .select('id, title, is_published, created_at, lessons(count)')
-        .eq('school_id', schoolId!)
-        .order('created_at', { ascending: false })
-        .limit(5),
-      supabase
-        .from('homework_submissions')
-        .select('*', { count: 'exact', head: true })
-        .eq('school_id', schoolId!)
-        .eq('status', 'submitted'),
-    ])
+  const [
+    studentsResult,
+    coursesResult,
+    lessonsResult,
+    recentCoursesResult,
+    pendingReviewsResult,
+    schoolResult,
+  ] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('school_id', schoolId!)
+      .eq('role', 'student'),
+    supabase
+      .from('courses')
+      .select('*', { count: 'exact', head: true })
+      .eq('school_id', schoolId!),
+    supabase
+      .from('lessons')
+      .select('*', { count: 'exact', head: true })
+      .eq('school_id', schoolId!)
+      .eq('is_published', true),
+    supabase
+      .from('courses')
+      .select('id, title, is_published, created_at, lessons(count)')
+      .eq('school_id', schoolId!)
+      .order('created_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('homework_submissions')
+      .select('*', { count: 'exact', head: true })
+      .eq('school_id', schoolId!)
+      .eq('status', 'submitted'),
+    supabase
+      .from('schools')
+      .select('color_scheme, primary_color')
+      .eq('id', schoolId!)
+      .single(),
+  ])
 
   const pendingReviews = pendingReviewsResult.count ?? 0
+  const { primary: accentColor } = resolveSchemeColors(
+    schoolResult.data?.color_scheme ?? null,
+    schoolResult.data?.primary_color ?? null
+  )
   const stats = [
     { label: t('totalStudents'), value: studentsResult.count ?? 0, icon: Users },
     { label: t('totalCourses'), value: coursesResult.count ?? 0, icon: BookOpen },
@@ -100,6 +116,7 @@ export default async function DashboardPage() {
         totalStudents={studentsResult.count ?? 0}
         totalCourses={coursesResult.count ?? 0}
         totalLessons={lessonsResult.count ?? 0}
+        accentColor={accentColor}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

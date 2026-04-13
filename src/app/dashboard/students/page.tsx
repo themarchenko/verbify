@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+
 import { getStudentsPaginated } from '@/features/students/api/students.queries'
 import { StudentList } from '@/features/students/components/StudentList'
 import { createClient } from '@/shared/api/supabase.server'
@@ -8,13 +10,17 @@ export default async function StudentsPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  if (!user) redirect('/login')
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('school_id')
-    .eq('user_id', user!.id)
+    .eq('user_id', user.id)
     .single()
 
-  const schoolId = profile!.school_id!
+  if (!profile?.school_id) redirect('/login')
+
+  const schoolId = profile.school_id
 
   const [initialPage, coursesResult] = await Promise.all([
     getStudentsPaginated(schoolId),

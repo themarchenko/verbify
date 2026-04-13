@@ -46,7 +46,7 @@ function RoleBadge({ role }: { role: string }) {
 
   if (role === 'owner') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+      <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground">
         <Crown size={12} />
         {t('roleOwner')}
       </span>

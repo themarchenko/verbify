@@ -1,8 +1,10 @@
 'use client'
 
 import type { Block } from '../types'
+import type { FillInBlankBlockContent } from '../types'
 import { AudioBlock } from './blocks/AudioBlock/AudioBlock'
 import { EmbedBlock } from './blocks/EmbedBlock/EmbedBlock'
+import { FillInBlankBlock } from './blocks/FillInBlankBlock/FillInBlankBlock'
 import { FileUploadBlock } from './blocks/FileUploadBlock/FileUploadBlock'
 import { FlashcardsBlock } from './blocks/FlashcardsBlock/FlashcardsBlock'
 import { OpenAnswerBlock } from './blocks/OpenAnswerBlock/OpenAnswerBlock'
@@ -96,6 +98,13 @@ export function BlockEditor({ block, onChange }: BlockEditorProps) {
               max_files?: number
             }
           }
+          onChange={onChange}
+        />
+      )
+    case 'fill_in_blank':
+      return (
+        <FillInBlankBlock
+          content={block.content as FillInBlankBlockContent}
           onChange={onChange}
         />
       )

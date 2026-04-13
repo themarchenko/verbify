@@ -16,7 +16,9 @@ interface EmbedBlockProps {
   onChange: (content: EmbedBlockContent) => void
 }
 
-function detectEmbedUrl(url: string): { embedUrl: string; provider: 'figma' | 'miro' } | null {
+function detectEmbedUrl(
+  url: string
+): { embedUrl: string; provider: 'figma' | 'miro' | 'canva' } | null {
   const trimmed = url.trim()
 
   // Figma: figma.com/file/... or figma.com/design/...
@@ -41,6 +43,19 @@ function detectEmbedUrl(url: string): { embedUrl: string; provider: 'figma' | 'm
     }
   }
 
+  // Canva: canva.com/design/ID/.../edit or /view
+  const canvaMatch = trimmed.match(
+    /^https?:\/\/(www\.)?canva\.com\/design\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)\/(edit|view)/
+  )
+  if (canvaMatch) {
+    const designId = canvaMatch[2]
+    const slug = canvaMatch[3]
+    return {
+      embedUrl: `https://www.canva.com/design/${designId}/${slug}/view?embed`,
+      provider: 'canva',
+    }
+  }
+
   return null
 }
 
@@ -52,6 +67,7 @@ export function EmbedBlock({ content, onChange }: EmbedBlockProps) {
     if (content.embed_url) {
       if (content.embed_url.includes('figma.com')) return { provider: 'figma' as const }
       if (content.embed_url.includes('miro.com')) return { provider: 'miro' as const }
+      if (content.embed_url.includes('canva.com')) return { provider: 'canva' as const }
     }
     return null
   }, [content.embed_url])

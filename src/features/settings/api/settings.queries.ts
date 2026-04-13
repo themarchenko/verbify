@@ -5,7 +5,7 @@ export async function getSchoolSettings(schoolId: string) {
 
   const { data, error } = await supabase
     .from('schools')
-    .select('name, slug, logo_url, custom_domain, color_scheme, login_heading, login_subheading')
+    .select('name, slug, logo_url, custom_domain, color_scheme, primary_color, login_heading, login_subheading')
     .eq('id', schoolId)
     .single()
 

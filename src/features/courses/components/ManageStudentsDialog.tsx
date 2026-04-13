@@ -4,10 +4,10 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { removeEnrollment, updateEnrollmentExpiration } from '@/features/enrollments'
+import { EnrollmentDatePicker } from '@/features/enrollments/components/EnrollmentDatePicker'
 import { formatDateMedium } from '@/shared/lib/date'
 import { Loader2, Search, UserPlus, Users, X } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/confirm-dialog'
 import { Input } from '@/components/ui/input'
@@ -186,15 +186,11 @@ function EnrolledStudentRow({
   const [expiresAt, setExpiresAt] = useState(
     enrollment.expiresAt ? enrollment.expiresAt.split('T')[0] : ''
   )
-  const [saving, setSaving] = useState(false)
 
-  const isExpired = enrollment.expiresAt && new Date(enrollment.expiresAt) < new Date()
-  const isDirty = expiresAt !== (enrollment.expiresAt ? enrollment.expiresAt.split('T')[0] : '')
+  const isExpired = !!(enrollment.expiresAt && new Date(enrollment.expiresAt) < new Date())
 
-  async function handleUpdateExpiration() {
-    setSaving(true)
-    await updateEnrollmentExpiration(enrollment.id, expiresAt || null)
-    setSaving(false)
+  async function handleSaveExpiration(value: string | null) {
+    await updateEnrollmentExpiration(enrollment.id, value)
     onExpirationUpdated()
   }
 
@@ -223,34 +219,13 @@ function EnrolledStudentRow({
           <X size={14} />
         </Button>
       </div>
-      <div className="flex items-center gap-2 mt-2 pl-11">
-        <Input
-          type="date"
+      <div className="mt-2 pl-11">
+        <EnrollmentDatePicker
           value={expiresAt}
-          onChange={(e) => setExpiresAt(e.target.value)}
-          className="w-36 h-7 text-xs"
+          onChange={setExpiresAt}
+          onSave={handleSaveExpiration}
+          isExpired={isExpired}
         />
-        {isDirty && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs px-2"
-            onClick={handleUpdateExpiration}
-            disabled={saving}
-          >
-            {saving ? t('common.saving') : t('common.save')}
-          </Button>
-        )}
-        {!expiresAt && !isDirty && (
-          <Badge variant="secondary" className="text-xs">
-            {t('courses.permanent')}
-          </Badge>
-        )}
-        {isExpired && expiresAt && !isDirty && (
-          <Badge variant="destructive" className="text-xs">
-            {t('learn.accessExpired')}
-          </Badge>
-        )}
       </div>
     </div>
   )

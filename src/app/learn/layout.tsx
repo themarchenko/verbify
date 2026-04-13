@@ -2,11 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-import {
-  COLOR_SCHEMES,
-  type ColorSchemeKey,
-  getContrastForeground,
-} from '@/features/settings/model/color-schemes.config'
+import { buildThemeVars } from '@/features/settings/model/color-schemes.config'
 import { createClient } from '@/shared/api/supabase.server'
 import { GraduationCap } from 'lucide-react'
 
@@ -29,11 +25,12 @@ export default async function StudentLayout({ children }: { children: React.Reac
   let schoolName = 'Verbify'
   let schoolLogoUrl: string | null = null
   let schoolColorScheme: string | null = null
+  let schoolPrimaryColor: string | null = null
 
   if (profile?.school_id) {
     const { data: school } = await supabase
       .from('schools')
-      .select('name, logo_url, color_scheme')
+      .select('name, logo_url, color_scheme, primary_color')
       .eq('id', profile.school_id)
       .single()
 
@@ -41,17 +38,11 @@ export default async function StudentLayout({ children }: { children: React.Reac
       schoolName = school.name
       schoolLogoUrl = school.logo_url
       schoolColorScheme = school.color_scheme
+      schoolPrimaryColor = school.primary_color
     }
   }
 
-  const scheme =
-    COLOR_SCHEMES[(schoolColorScheme as ColorSchemeKey) ?? 'default'] ?? COLOR_SCHEMES.default
-  const themeVars = {
-    '--primary': scheme.primary,
-    '--primary-foreground': getContrastForeground(scheme.primary),
-    '--ring': scheme.primary,
-    '--accent': scheme.accent,
-  } as React.CSSProperties
+  const themeVars = buildThemeVars(schoolColorScheme, schoolPrimaryColor)
 
   return (
     <div className="min-h-screen flex flex-col" style={themeVars}>

@@ -182,6 +182,7 @@ type PixelBackgroundProps = {
   pattern?: AnimationPattern
   colors?: string
   className?: string
+  style?: React.CSSProperties
   children?: React.ReactNode
 }
 
@@ -193,6 +194,7 @@ function PixelBackground({
   pattern = 'center',
   colors = DEFAULT_COLORS,
   className,
+  style,
   children,
 }: PixelBackgroundProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -305,6 +307,7 @@ function PixelBackground({
       ref={containerRef}
       data-slot="pixel-background"
       className={cn('relative overflow-hidden isolate', className)}
+      style={style}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
